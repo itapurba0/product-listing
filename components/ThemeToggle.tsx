@@ -1,17 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function ThemeToggle() {
   const [dark, setDark] = useState(false);
+  const mounted = useRef(false);
 
   useEffect(() => {
     const isDark =
       localStorage.theme === "dark" ||
       (!("theme" in localStorage) &&
         window.matchMedia("(prefers-color-scheme: dark)").matches);
-    setDark(isDark);
     document.documentElement.classList.toggle("dark", isDark);
+    mounted.current = true;
+    // Use requestAnimationFrame to avoid synchronous setState in effect
+    requestAnimationFrame(() => {
+      setDark(isDark);
+    });
   }, []);
 
   function toggle() {
